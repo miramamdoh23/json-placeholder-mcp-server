@@ -1,207 +1,396 @@
-# Postman MCP Generator
+# JSONPlaceholder MCP Server
 
-Welcome to your generated MCP server! 🚀 This project was created with the [Postman MCP Generator](https://postman.com/explore/mcp-generator), configured to [Model Context Provider (MCP)](https://modelcontextprotocol.io/introduction) Server output mode. It provides you with:
+This is a Model Context Protocol (MCP) server generated via Postman. It acts as a bridge between AI agents (like Claude or Gemini) and the JSONPlaceholder API, allowing AI models to fetch and manage mock data in real-time.
 
-- ✅ An MCP-compatible server (`mcpServer.js`)
-- ✅ Automatically generated JavaScript tools for each selected Postman API request
+---
 
-Let's set things up!
+## Features
 
-## 🚦 Getting Started
+- **Post Management**: AI can fetch all posts, retrieve specific posts by ID, and create new posts
+- **User Data**: Access to user profiles and information
+- **Comment Interaction**: Ability to read comments from the mock database
+- **Full MCP Integration**: Built to work seamlessly with any AI tool that supports the Model Context Protocol
 
-### ⚙️ Prerequisites
+---
 
-Before starting, please ensure you have:
+## Technology Stack
 
-- [Node.js (v18+ required, v20+ recommended)](https://nodejs.org/)
-- [npm](https://www.npmjs.com/) (included with Node)
+- **Language**: TypeScript / Node.js
+- **Protocol**: Model Context Protocol (MCP)
+- **API Source**: JSONPlaceholder
+- **Tooling**: Generated using Postman MCP Generator
 
-Warning: if you run with a lower version of Node, `fetch` won't be present. Tools use `fetch` to make HTTP calls. To work around this, you can modify the tools to use `node-fetch` instead. Make sure that `node-fetch` is installed as a dependency and then import it as `fetch` into each tool file.
+---
 
-### 📥 Installation & Setup
+## How it Works
 
-**1. Install dependencies**
+This server provides a set of tools that an AI agent can call. When you ask the AI to "Get the latest posts," it uses this MCP server to make a real-world API call to JSONPlaceholder and processes the data for you.
 
-Run from your project's root directory:
+---
 
-```sh
+## Installation
+
+### Prerequisites
+
+- Node.js 18 or higher
+- npm or yarn package manager
+- Basic understanding of Model Context Protocol
+
+### Setup Instructions
+
+**1. Clone the repository:**
+```bash
+git clone https://github.com/miramamdoh23/jsonplaceholder-mcp-server.git
+cd jsonplaceholder-mcp-server
+```
+
+**2. Install dependencies:**
+```bash
 npm install
 ```
 
-### 🔐 Set tool environment variables
-
-In the `.env` file, you'll see environment variable placeholders, one for each workspace that the selected tools are from. For example, if you selected requests from 2 workspaces, e.g. Acme and Widgets, you'll see two placeholders:
-
-```
-ACME_API_KEY=
-WIDGETS_API_KEY=
+**3. Build the project:**
+```bash
+npm run build
 ```
 
-Update the values with actual API keys for each API. These environment variables are used inside of the generated tools to set the API key for each request. You can inspect a file in the `tools` directory to see how it works.
-
-```javascript
-// environment variables are used inside of each tool file
-const apiKey = process.env.ACME_API_KEY;
+**4. Start the server:**
+```bash
+npm start
 ```
 
-**Caveat:** This may not be correct for every API. The generation logic is relatively simple - for each workspace, we create an environment variable with the same name as the workspace slug, and then use that environment variable in each tool file that belongs to that workspace. If this isn't the right behavior for your chosen API, no problem! You can manually update anything in the `.env` file or tool files to accurately reflect the API's method of authentication.
+---
 
-## 🌐 Test the MCP Server with Postman
+## Available Tools
 
-The MCP Server (`mcpServer.js`) exposes your automated API tools to MCP-compatible clients, such as Claude Desktop or the Postman Desktop Application. We recommend that you test the server with Postman first and then move on to using it with an LLM.
+### 1. Get All Posts
+Fetches all posts from JSONPlaceholder.
 
-The Postman Desktop Application is the easiest way to run and test MCP servers. Testing the downloaded server first is optional but recommended.
-
-**Step 1**: Download the latest Postman Desktop Application from [https://www.postman.com/downloads/](https://www.postman.com/downloads/).
-
-**Step 2**: Read out the documentation article [here](https://learning.postman.com/docs/postman-ai-agent-builder/mcp-requests/create/) and see how to create an MCP request inside the Postman app.
-
-**Step 3**: Set the type of the MCP request to `STDIO` and set the command to `node </absolute/path/to/mcpServer.js>`. If you have issues with using only `node` (e.g. an old version is used), supply an absolute path instead to a node version 18+. You can get the full path to node by running:
-
-```sh
-which node
+**Usage:**
+```typescript
+// AI can request: "Show me all posts"
+GET /posts
 ```
 
-To check the node version, run:
-
-```sh
-node --version
+**Response:**
+```json
+[
+  {
+    "userId": 1,
+    "id": 1,
+    "title": "Post title",
+    "body": "Post content"
+  }
+]
 ```
 
-To get the absolute path to `mcpServer.js`, run:
+### 2. Get Post by ID
+Retrieves a specific post by its ID.
 
-```sh
-realpath mcpServer.js
+**Usage:**
+```typescript
+// AI can request: "Get post number 5"
+GET /posts/{id}
 ```
 
-Use the node command followed by the full path to `mcpServer.js` as the command for your new Postman MCP Request. Then click the **Connect** button. You should see a list of tools that you selected before generating the server. You can test that each tool works here before connecting the MCP server to an LLM.
+**Response:**
+```json
+{
+  "userId": 1,
+  "id": 5,
+  "title": "Post title",
+  "body": "Post content"
+}
+```
 
-## 👩‍💻 Connect the MCP Server to Claude
+### 3. Create New Post
+Creates a new post in the mock database.
 
-You can connect your MCP server to any MCP client. Here we provide instructions for connecting it to Claude Desktop.
+**Usage:**
+```typescript
+// AI can request: "Create a post about AI testing"
+POST /posts
+```
 
-**Step 1**: Note the full path to node and the `mcpServer.js` from the previous step.
+**Request Body:**
+```json
+{
+  "title": "AI Testing Best Practices",
+  "body": "Content about AI testing",
+  "userId": 1
+}
+```
 
-**Step 2**. Open Claude Desktop → **Settings** → **Developers** → **Edit Config** and add a new MCP server:
+### 4. Get User Data
+Fetches user profile information.
 
+**Usage:**
+```typescript
+// AI can request: "Show me user profile for user 1"
+GET /users/{id}
+```
+
+### 5. Get Comments
+Retrieves comments from posts.
+
+**Usage:**
+```typescript
+// AI can request: "Show me comments for post 1"
+GET /posts/{id}/comments
+```
+
+---
+
+## Integration with AI Agents
+
+### Claude Desktop Integration
+
+Add to your Claude Desktop configuration (`claude_desktop_config.json`):
 ```json
 {
   "mcpServers": {
-    "<server_name>": {
-      "command": "</absolute/path/to/node>",
-      "args": ["</absolute/path/to/mcpServer.js>"]
+    "jsonplaceholder": {
+      "command": "node",
+      "args": ["/path/to/jsonplaceholder-mcp-server/build/index.js"]
     }
   }
 }
 ```
 
-Restart Claude Desktop to activate this change. Make sure the new MCP is turned on and has a green circle next to it. If so, you're ready to begin a chat session that can use the tools you've connected.
+### Generic MCP Client Integration
+```typescript
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 
-**Warning**: If you don't supply an absolute path to a `node` version that is v18+, Claude (and other MCP clients) may fall back to another `node` version on the system of a previous version. In this case, the `fetch` API won't be present and tool calls will not work. If that happens, you can a) install a newer version of node and point to it in the command, or b) import `node-fetch` into each tool as `fetch`, making sure to also add the `node-fetch` dependency to your package.json.
+const client = new Client({
+  name: "jsonplaceholder-client",
+  version: "1.0.0"
+});
 
-### Additional Options
-
-#### 🐳 Docker Deployment (Production)
-
-For production deployments, you can use Docker:
-
-**1. Build Docker image**
-
-```sh
-docker build -t <your_server_name> .
+await client.connect({
+  command: "node",
+  args: ["./build/index.js"]
+});
 ```
 
-**2. Claude Desktop Integration**
+---
 
-Add Docker server configuration to Claude Desktop (Settings → Developers → Edit Config):
-
-```json
-{
-  "mcpServers": {
-    "<your_server_name>": {
-      "command": "docker",
-      "args": ["run", "-i", "--rm", "--env-file=.env", "<your_server_name>"]
-    }
-  }
-}
+## Project Structure
+```
+jsonplaceholder-mcp-server/
+│
+├── src/
+│   ├── index.ts              # Main server entry point
+│   ├── tools/                # MCP tool definitions
+│   │   ├── posts.ts         # Post management tools
+│   │   ├── users.ts         # User data tools
+│   │   └── comments.ts      # Comment tools
+│   └── utils/               # Helper functions
+│       └── api-client.ts    # JSONPlaceholder API client
+│
+├── build/                    # Compiled JavaScript output
+├── package.json             # Project dependencies
+├── tsconfig.json            # TypeScript configuration
+└── README.md                # This file
 ```
 
-> Add your environment variables (API keys, etc.) inside the `.env` file.
+---
 
-The project comes bundled with the following minimal Docker setup:
+## Example Use Cases
 
-```dockerfile
-FROM node:22.12-alpine AS builder
+### 1. Content Analysis
+**AI Request:** "Analyze the sentiment of all posts"
 
-WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm install
+The MCP server fetches all posts, and the AI processes the content to provide sentiment analysis.
 
-COPY . .
+### 2. User Research
+**AI Request:** "Find all posts by user 3"
 
-ENTRYPOINT ["node", "mcpServer.js"]
+The server retrieves user data and filters posts accordingly.
+
+### 3. Comment Management
+**AI Request:** "Show me the most recent comments on post 10"
+
+The server fetches comments and presents them to the AI for further processing.
+
+### 4. Data Generation
+**AI Request:** "Create 5 sample blog posts about technology"
+
+The AI uses the server to create multiple posts with generated content.
+
+---
+
+## API Reference
+
+### Base URL
+```
+https://jsonplaceholder.typicode.com
 ```
 
-#### 🌐 Streamable HTTP
+### Endpoints
 
-To run the server with Streamable HTTP support, use the `--streamable-http` flag. This launches the server with the `/mcp` endpoint enabled:
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /posts | Get all posts |
+| GET | /posts/{id} | Get specific post |
+| POST | /posts | Create new post |
+| GET | /users | Get all users |
+| GET | /users/{id} | Get specific user |
+| GET | /comments | Get all comments |
+| GET | /posts/{id}/comments | Get post comments |
 
-```sh
-node mcpServer.js --streamable-http
+---
+
+## Development
+
+### Running in Development Mode
+```bash
+npm run dev
 ```
 
-#### 🌐 Server-Sent Events (SSE)
-
-To run the server with Server-Sent Events (SSE) support, use the `--sse` flag. This launches the server with the `/sse` and `/messages` endpoints enabled:
-
-```sh
-node mcpServer.js --sse
+### Running Tests
+```bash
+npm test
 ```
 
-#### 🖥️ Stdio (Standard Input/Output)
-
-To run the server using standard input/output (stdio), simply run the script without any flags. This mode is ideal for CLI tools or programmatic integration via stdin and stdout.
-
-```sh
-node mcpServer.js
+### Linting
+```bash
+npm run lint
 ```
 
-## 🛠️ Additional CLI commands
-
-#### List tools
-
-List descriptions and parameters from all generated tools with:
-
-```sh
-node index.js tools
+### Building for Production
+```bash
+npm run build
 ```
 
-Example:
+---
 
+## Configuration
+
+### Environment Variables
+
+Create a `.env` file in the root directory:
+```env
+# API Configuration
+API_BASE_URL=https://jsonplaceholder.typicode.com
+PORT=3000
+
+# MCP Configuration
+MCP_SERVER_NAME=jsonplaceholder
+MCP_VERSION=1.0.0
+
+# Logging
+LOG_LEVEL=info
 ```
-Available Tools:
 
-Workspace: acme-workspace
-  Collection: useful-api
-    list_all_customers
-      Description: Retrieve a list of useful things.
-      Parameters:
-        - magic: The required magic power
-        - limit: Number of results returned
-        [...additional parameters...]
+---
+
+## Skills Demonstrated
+
+- **Model Context Protocol**: Implementation of MCP for AI agent integration
+- **API Integration**: RESTful API communication with JSONPlaceholder
+- **TypeScript Development**: Type-safe code with modern TypeScript features
+- **Tool Design**: Creating AI-usable tools with clear interfaces
+- **Documentation**: Comprehensive API and usage documentation
+- **Testing**: Unit and integration testing for MCP tools
+- **AI Agent Development**: Building bridges between AI and external services
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+**Issue: Server not starting**
+```bash
+# Solution: Check Node.js version
+node --version  # Should be 18+
+
+# Reinstall dependencies
+rm -rf node_modules package-lock.json
+npm install
 ```
 
-## ➕ Adding New Tools
+**Issue: Connection timeout**
+```bash
+# Solution: Check network connectivity
+curl https://jsonplaceholder.typicode.com/posts
 
-Extend your MCP server with more tools easily:
+# Verify server is running
+npm run build && npm start
+```
 
-1. Visit [Postman MCP Generator](https://postman.com/explore/mcp-generator).
-2. Pick new API request(s), generate a new MCP server, and download it.
-3. Copy new generated tool(s) into your existing project's `tools/` folder.
-4. Update your `tools/paths.js` file to include new tool references.
+**Issue: Tool not recognized by AI**
+```bash
+# Solution: Verify MCP configuration
+# Check claude_desktop_config.json has correct path
+# Restart Claude Desktop after changes
+```
 
-## 💬 Questions & Support
+---
 
-Visit the [Postman MCP Generator](https://postman.com/explore/mcp-generator) page for updates and new capabilities.
+## Future Enhancements
 
-Join the `#mcp-lab` channel in the [Postman Discord](https://discord.gg/PQAWcPkprM) to share what you've built and get help.
+- Add support for PUT and DELETE operations
+- Implement caching for improved performance
+- Add rate limiting and error handling
+- Support for additional JSONPlaceholder endpoints
+- WebSocket support for real-time updates
+- Authentication and authorization layer
+- Metrics and monitoring dashboard
+
+---
+
+## Use Cases
+
+This MCP server is ideal for:
+
+- **AI Assistant Development**: Building AI tools that need access to mock data
+- **Testing AI Integrations**: Testing MCP implementations with reliable mock APIs
+- **Educational Projects**: Learning Model Context Protocol development
+- **Prototype Development**: Quick prototyping of AI-powered applications
+- **API Testing**: Automated testing of AI agent API interactions
+
+---
+
+## Related Resources
+
+- [Model Context Protocol Documentation](https://modelcontextprotocol.io/)
+- [JSONPlaceholder API Documentation](https://jsonplaceholder.typicode.com/)
+- [Postman MCP Generator](https://www.postman.com/)
+- [TypeScript Documentation](https://www.typescriptlang.org/)
+
+---
+
+## Author
+
+**Mira Mamdoh Yousef Mossad**  
+AI QA Engineer | MCP Developer
+
+**Specializing in**:
+- Model Context Protocol Development
+- AI Agent Integration
+- API Testing & Validation
+- TypeScript Development
+
+**Connect**:
+- Email: miramamdoh10@gmail.com
+- LinkedIn: [linkedin.com/in/mira-mamdoh-a9aa78224](https://www.linkedin.com/in/mira-mamdoh-a9aa78224)
+- GitHub: [github.com/miramamdoh23](https://github.com/miramamdoh23)
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+## Acknowledgments
+
+Built to demonstrate Model Context Protocol implementation and AI agent integration using Postman MCP Generator and JSONPlaceholder API.
+
+---
+
+**Note:** This is a mock data server for demonstration and testing purposes. For production use, replace JSONPlaceholder with your actual API endpoints.
+
+For questions or issues, please open an issue on GitHub or contact the maintainer.
